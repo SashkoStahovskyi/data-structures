@@ -115,12 +115,12 @@ public class ArrayList implements List {
         return -1;
     }
 
-    @Override
-    public String toString () {
-        StringJoiner stringJoiner = new StringJoiner(", ","[","]");
-        for (int i = 0; i < size; i++) {
-            stringJoiner.add(array[i].toString());
-        }
-        return StringJoiner.toString();
-    }
+//    @Override
+//    public String toString () {
+//        StringJoiner stringJoiner = new StringJoiner(", ","[","]");
+//        for (int i = 0; i < size; i++) {
+//            stringJoiner.add(array[i].toString());
+//        }
+//        return StringJoiner.toString(); // toString - ???
+//    }
 }
