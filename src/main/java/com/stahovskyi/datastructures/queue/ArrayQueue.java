@@ -1,5 +1,7 @@
 package com.stahovskyi.datastructures.queue;
 
+import java.util.StringJoiner;
+
 public class ArrayQueue implements Queue {
     private int size;
     private Object[] array;
@@ -63,5 +65,14 @@ public class ArrayQueue implements Queue {
             array[i] = null;
         }
         size = 0;
+    }
+
+    @Override
+    public String toString(){
+        StringJoiner stringJoiner = new StringJoiner(", ","[ "," ]");
+        for (int i = 0; i < size; i++) {
+            stringJoiner.add(array[i].toString());
+        }
+        return stringJoiner.toString();
     }
 }

@@ -1,13 +1,15 @@
 package com.stahovskyi.datastructures.arraylist;
 
-import java.util.StringJoiner;
+import java.util.Objects;
 
 public class ArrayList implements List {
+    private static final int DEFAULT_INITIAL_CAPACITY = 10;
+
     private int size;
     private Object[] array;
 
     public ArrayList() {
-        array = new Object[10];
+        array = new Object[DEFAULT_INITIAL_CAPACITY];
     }
 
     @Override
@@ -17,8 +19,8 @@ public class ArrayList implements List {
 
     @Override
     public void add(Object value, int index) {
-        if (index > size) {
-            throw new IllegalStateException(" Index is larger than the array !!! Array size is: " + size);
+        if (index < 0 || index > size) {
+            throw new IllegalStateException("Index more or less than size list ! " + " size is : " + size);
         }
         grow();
         System.arraycopy(array, index, array, index + 1, size - index);
@@ -26,43 +28,33 @@ public class ArrayList implements List {
         size++;
     }
 
-    private void grow() {
-        if (array.length == size) {
-            Object[] newArray = new Object[size * 2];
-            System.arraycopy(array, 0, newArray, 0, size);
-            array = newArray;
-        }
-    }
-
     @Override
     public Object remove(int index) {
         if (isEmpty()) {
-            throw new IllegalStateException(" Array is empty!!!");
+            throw new IllegalStateException(" Array is empty !!!");
         }
-        if (index > size) {
-            throw new IndexOutOfBoundsException("Index Out Of Bounds Exception !! Array size is: " + size);
+        if (index < 0 || index > size) {
+            throw new IllegalStateException("Index more or less than list size ! " + " size is : " + size);
         }
         Object result = get(index);
         System.arraycopy(array, index + 1, array, index, size - index - 1);
-        array[size] = null;  // memory leek  !!
+        array[size - 1] = null;
         size--;
         return result;
     }
 
     @Override
-    public Object get(int index) {   // ??
+    public Object get(int index) {
         if (isEmpty()) {
             throw new IllegalStateException("Array is empty !!");
         }
         return array[index];
     }
 
-    // we can set value by index between[0, size-1]
-    // otherwise throw new IndexOfBoundsExceptions
     @Override
     public Object set(Object value, int index) {
-        if(index > size) {
-            throw new IllegalStateException(" Index is larger than the array!!! Array size is: " + size );
+        if (index < 0 || index > size) {
+            throw new IllegalStateException("Index more or less than list size ! " + " size is : " + size);
         }
         Object object = array[index];
         array[index] = value;
@@ -96,9 +88,9 @@ public class ArrayList implements List {
     }
 
     @Override
-    public int indexOf(Object value) {      // if array index is - null !!!???
-        for (int i = 0; i < size; i++) {
-            if (value.equals(array[i])) {
+    public int indexOf(Object value) {
+        for (int i = 0; i < size-1; i++) {
+            if (Objects.equals(value, array[i])) {
                 return i;
             }
         }
@@ -107,20 +99,19 @@ public class ArrayList implements List {
 
     @Override
     public int lastIndexOf(Object value) {
-        for (int i = size; i > 0; i--) {
-            if (value.equals(array[i])) {
+        for (int i = size-1; i > 0; i--) {
+            if (Objects.equals(value, array[i])) {
                 return i;
             }
         }
         return -1;
     }
 
-//    @Override
-//    public String toString () {
-//        StringJoiner stringJoiner = new StringJoiner(", ","[","]");
-//        for (int i = 0; i < size; i++) {
-//            stringJoiner.add(array[i].toString());
-//        }
-//        return StringJoiner.toString(); // toString - ???
-//    }
+    private void grow() {
+        if (array.length == size) {
+            Object[] newArray = new Object[size * 2]; // how make 1,5 ??
+            System.arraycopy(array, 0, newArray, 0, size);
+            array = newArray;
+        }
+    }
 }

@@ -109,9 +109,17 @@ public class ArrayQueueTest {
 
         assertEquals(4,arrayQueue.size());
         assertFalse(arrayQueue.contains(null));
+    }
 
+    @Test
+    public void testToString(){
+        ArrayQueue arrayQueue = new ArrayQueue();
+        arrayQueue.enqueue("A");
+        arrayQueue.enqueue("B");
+        arrayQueue.enqueue("C");
 
-
-
+        String expected = "[A,B,C]";
+        String actual = arrayQueue.toString();
+        assertEquals(expected,actual);
     }
 }

@@ -1,8 +1,16 @@
 package com.stahovskyi.datastructures.arraylist;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /*
  add(Object value) -ok !
+
 add(Object value, int index) -ok!
+testAddByIndexThrowIllegalStateOfExceptionWhenIndexLargeThenSize -ok
+testAddByIndexThrowIllegalStateOfExceptionWhenIndexLessThenSize - ok
+
  remove(int index) - ok !
  get(int index)  - ok!
  set(Object value, int index0)  - ok!
@@ -17,13 +25,61 @@ lastIndexOf(Object value) - ok!
  test Get Throw Illegal State Of Exception When Array Is Empty
  */
 
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
 public class ArrayListTest {
+
+    @Test
+    public void testAddToList() {
+        ArrayList arrayList = new ArrayList();
+        arrayList.add("A");
+        arrayList.add("B");
+        arrayList.add("C");
+
+        assertEquals(3, arrayList.size());
+        assertEquals("A", arrayList.get(0));
+        assertEquals("B", arrayList.get(1));
+    }
+
+    @Test
+    public void testAddByIndex() {
+        ArrayList arrayList = new ArrayList();
+        arrayList.add("A");
+        arrayList.add("B");
+        arrayList.add("C");
+
+        arrayList.add("NEW OBJECT", 1);
+        assertEquals(4, arrayList.size());
+        assertEquals(1, arrayList.indexOf("NEW OBJECT"));
+        assertEquals(2, arrayList.indexOf("B"));
+    }
+
+    @Test
+    public void testAddByIndexThrowIllegalStateOfExceptionWhenIndexLargeThenSize() {
+        ArrayList arrayList = new ArrayList();
+        arrayList.add("A");
+        Assertions.assertThrows(IllegalStateException.class, () -> {
+            arrayList.add("A", 3);
+        });
+    }
+
+    @Test
+    public void testAddByIndexThrowIllegalStateOfExceptionWhenIndexLessThenSize() {
+        ArrayList arrayList = new ArrayList();
+        arrayList.add("A");
+        Assertions.assertThrows(IllegalStateException.class, () -> {
+            arrayList.add("A", -3);
+        });
+    }
+
+
+
+
+
+
+
+
+
+    // ***************************************//
+
 
     @Test
     public void testAddAndRemoveAndChangeSize() {
@@ -41,7 +97,7 @@ public class ArrayListTest {
         ArrayList arrayList = new ArrayList();
         arrayList.add("A");
 
-        Assertions.assertThrows(IndexOutOfBoundsException.class, () -> {
+        Assertions.assertThrows(IllegalStateException.class, () -> {
             arrayList.remove(3);
         });
     }
@@ -110,15 +166,5 @@ public class ArrayListTest {
         arrayList.clear();
         assertTrue(arrayList.isEmpty());
     }
-
-   /* @Test
-    public void testToString () {
-        ArrayList arrayList = new ArrayList();
-        arrayList.add("A");
-        arrayList.add("B");
-
-        assertEquals("[A,B]",arrayList.toString());
-    }  */
-
 }
 
