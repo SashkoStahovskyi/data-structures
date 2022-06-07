@@ -1,9 +1,9 @@
 package com.stahovskyi.datastructures.stack;
 
-public class ArrayStackTest extends AbstractStackTest {
+public class LinkedStackTest extends AbstractStackTest {
 
     @Override
     protected Stack getStack() {
-        return new ArrayStack();
+        return new LinkedStack();
     }
 }

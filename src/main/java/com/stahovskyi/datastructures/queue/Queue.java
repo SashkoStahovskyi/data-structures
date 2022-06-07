@@ -1,20 +1,24 @@
 package com.stahovskyi.datastructures.queue;
 
-public interface Queue {
+import java.util.Iterator;
 
-    void enqueue(Object value);
+public interface Queue<T> {
 
-    Object dequeue();
+    void enqueue(T value);
 
-    Object peek();
+    T dequeue();
+
+    T peek();
 
     int size();
 
     boolean isEmpty();
 
-    boolean contains(Object value);
+    boolean contains(T value);
 
     void clear();
 
     String toString();
+
+    Iterator<T> iterator();
 }

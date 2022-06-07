@@ -1,17 +1,23 @@
 package com.stahovskyi.datastructures.stack;
 
-public interface Stack {
-    void push(Object value);
+import java.util.Iterator;
 
-    Object pop();
+public interface Stack <T> {
 
-    Object peek();
+    void push(T value) ;
 
-    boolean contains(Object value);
+    T pop();
+
+    T peek();
+
+    boolean contains(T value);
 
     int size();
 
     boolean isEmpty();
 
     void clear();
+
+
+    Iterator<T> iterator();
 }

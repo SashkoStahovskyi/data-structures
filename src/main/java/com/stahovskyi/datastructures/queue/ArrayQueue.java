@@ -1,38 +1,38 @@
 package com.stahovskyi.datastructures.queue;
 
+import java.util.Iterator;
+import java.util.Objects;
 import java.util.StringJoiner;
 
-public class ArrayQueue implements Queue {
+public class ArrayQueue<T> implements Queue<T> {
+    private final int DEFAULT_INITIAL_CAPACITY = 10;
     private int size;
-    private Object[] array;
+    private T[] array;
 
     public ArrayQueue() {
-        array = new Object[10];
+        array = (T[]) new Object[DEFAULT_INITIAL_CAPACITY];
     }
 
     @Override
-    public void enqueue(Object value) {
+    public void enqueue(T value) {
+        ensureCapacity();
         array[size] = value;
         size++;
     }
 
     @Override
-    public Object dequeue() {
-        if (isEmpty()) {
-            throw new IllegalStateException("Array is empty !!");
-        }
-        Object value = array[size - 1];
-        array[size - 1] = null;
+    public T dequeue() {
+        emptyQueueCheck();
+        T returnValue = array[0];
+        System.arraycopy(array, 1, array, 0, size - 1);
         size--;
-        return value;
+        return returnValue;
     }
 
     @Override
-    public Object peek() {
-        if (size == 0) {
-            throw new IllegalStateException("Array is empty !!");
-        }
-        return array[size - 1];
+    public T peek() {
+        emptyQueueCheck();
+        return array[0];
     }
 
     @Override
@@ -49,17 +49,6 @@ public class ArrayQueue implements Queue {
     }
 
     @Override
-    public boolean contains(Object value){      // null - ?
-        for (int i = 0; i < size - 1; i++) {
-            Object result = array[i];
-            if (value.equals(result)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    @Override
     public void clear() {
         for (int i = 0; i < size; i++) {
             array[i] = null;
@@ -68,11 +57,77 @@ public class ArrayQueue implements Queue {
     }
 
     @Override
-    public String toString(){
-        StringJoiner stringJoiner = new StringJoiner(", ","[ "," ]");
+    public boolean contains(T value) {
+        emptyQueueCheck();
+        for (int i = 0; i < size; i++) {
+            T valueInQueue = array[i];
+            if (Objects.equals(value, valueInQueue)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    @Override
+    public String toString() {
+        StringJoiner stringJoiner = new StringJoiner(", ", "[ ", " ]");
         for (int i = 0; i < size; i++) {
             stringJoiner.add(array[i].toString());
         }
         return stringJoiner.toString();
+    }
+
+    private void emptyQueueCheck() {
+        if (isEmpty()) {
+            throw new IllegalStateException(" Queue is empty !!");
+        }
+    }
+
+    private void ensureCapacity() {
+        if (array.length == size) {
+            T[] newArray = (T[]) new Object[(int) (array.length * 1.5)];
+            System.arraycopy(array, 0, newArray, 0, size);
+            array = (T[]) newArray;
+        }
+    }
+
+    @Override
+    public Iterator<T> iterator() {
+        return new ArrayQueueIterator();
+    }
+
+    private class ArrayQueueIterator implements Iterator<T> {
+
+        private int index = 0;
+        private boolean alreadyRemoved = true;
+
+        public boolean hasNext() {
+            return index < size;
+        }
+
+        @Override
+        public T next() {
+            if (!hasNext()) {
+                throw new IllegalStateException(" Next Element Not Exist !");
+            }
+            T returnValue = array[index];
+            index++;
+            return returnValue;
+        }
+
+        @Override
+        public void remove() {
+            if (!alreadyRemoved) {
+                throw new IllegalStateException(" Element Already Removed !");
+            }
+            removeByIndex(index - 1);
+            alreadyRemoved = false;
+        }
+
+        private void removeByIndex(int index) {
+            System.arraycopy(array, index + 1, array, index, size - index - 1);
+            array[size - 1] = null; // memory lick fix
+            size--;
+        }
     }
 }
