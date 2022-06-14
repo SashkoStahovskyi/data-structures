@@ -1,14 +1,17 @@
 package com.stahovskyi.datastructures.queue;
 
 import java.util.Iterator;
+import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.StringJoiner;
 
 public class ArrayQueue<T> implements Queue<T> {
     private final int DEFAULT_INITIAL_CAPACITY = 10;
+    private final double DEFAULT_GROW_FACTOR = 1.5;
     private int size;
     private T[] array;
 
+    @SuppressWarnings("unchecked")
     public ArrayQueue() {
         array = (T[]) new Object[DEFAULT_INITIAL_CAPACITY];
     }
@@ -42,10 +45,7 @@ public class ArrayQueue<T> implements Queue<T> {
 
     @Override
     public boolean isEmpty() {
-        if (size == 0) {
-            return true;
-        }
-        return false;
+        return size == 0;
     }
 
     @Override
@@ -71,23 +71,24 @@ public class ArrayQueue<T> implements Queue<T> {
     @Override
     public String toString() {
         StringJoiner stringJoiner = new StringJoiner(", ", "[ ", " ]");
-        for (int i = 0; i < size; i++) {
-            stringJoiner.add(array[i].toString());
+        for (T value : this) {
+            stringJoiner.add(String.valueOf(value));
         }
         return stringJoiner.toString();
     }
 
     private void emptyQueueCheck() {
         if (isEmpty()) {
-            throw new IllegalStateException(" Queue is empty !!");
+            throw new IllegalStateException(" Queue Is Empty !!");
         }
     }
 
     private void ensureCapacity() {
         if (array.length == size) {
-            T[] newArray = (T[]) new Object[(int) (array.length * 1.5)];
+            @SuppressWarnings("unchecked")
+            T[] newArray = (T[]) new Object[(int) (array.length * DEFAULT_GROW_FACTOR) + 1];
             System.arraycopy(array, 0, newArray, 0, size);
-            array = (T[]) newArray;
+            array = newArray;
         }
     }
 
@@ -98,8 +99,8 @@ public class ArrayQueue<T> implements Queue<T> {
 
     private class ArrayQueueIterator implements Iterator<T> {
 
-        private int index = 0;
-        private boolean alreadyRemoved = true;
+        private int index;
+        private boolean canRemove;
 
         public boolean hasNext() {
             return index < size;
@@ -108,26 +109,23 @@ public class ArrayQueue<T> implements Queue<T> {
         @Override
         public T next() {
             if (!hasNext()) {
-                throw new IllegalStateException(" Next Element Not Exist !");
+                throw new NoSuchElementException(" Next Element Not Exist !");
             }
             T returnValue = array[index];
             index++;
+            canRemove = true;
             return returnValue;
         }
 
         @Override
         public void remove() {
-            if (!alreadyRemoved) {
-                throw new IllegalStateException(" Element Already Removed !");
+            if (!canRemove) {
+                throw new IllegalStateException("Method Has Already Been Called After The Last Call Or Method Next Not Yet Been Called!");
             }
-            removeByIndex(index - 1);
-            alreadyRemoved = false;
-        }
-
-        private void removeByIndex(int index) {
-            System.arraycopy(array, index + 1, array, index, size - index - 1);
-            array[size - 1] = null; // memory lick fix
+            System.arraycopy(array, index, array, index - 1, size - index);
+            array[size - 1] = null;
             size--;
+            canRemove = false;
         }
     }
 }

@@ -6,26 +6,31 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.util.Iterator;
+import java.util.NoSuchElementException;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 class HashMapTest {
 
     private Map<String, String> hashMap;
+    private Iterator<HashMap.Entry<String, String>> iterator;
 
     @BeforeEach
     public void before() {
         hashMap = new HashMap<>();
+        iterator = hashMap.iterator();
     }
 
-    @DisplayName("test Put New Value And Size Work Correctly")
+    @DisplayName("test Put Add New Value And Change Size Work Correctly")
     @Test
-    public void testPutNewValueAndSizeWorkCorrectly() {
+    public void testPutAddNewValueAndChangeSizeWorkCorrectly() {
         assertEquals(0, hashMap.size());
         hashMap.put("key1", "value1");
         hashMap.put("key2", "value2");
 
         assertEquals(2, hashMap.size());
+        assertEquals("value1", hashMap.get("key1"));
+        assertEquals("value2", hashMap.get("key2"));
     }
 
     @DisplayName("test Put Replace Exist Value On New Value")
@@ -33,13 +38,14 @@ class HashMapTest {
     public void testPutReplaceExistValueOnNewValue() {
         hashMap.put("key1", "value1");
         hashMap.put("key2", "oldValue");
-        assertEquals(2, hashMap.size());
+
         assertEquals("oldValue", hashMap.put("key2", "newValue"));
+        assertEquals("newValue", hashMap.get("key2"));
     }
 
-    @DisplayName("tes Get Work Correctly")
+    @DisplayName("tes Get Returns The Value To Which The Specified Key Is Mapped")
     @Test
-    public void testGetWorkCorrectly() {
+    public void tesGetReturnsTheValueToWhichTheSpecifiedKeyIsMapped() {
         hashMap.put("key1", "value1");
         hashMap.put("key2", "value2");
         assertEquals("value2", hashMap.get("key2"));
@@ -64,27 +70,31 @@ class HashMapTest {
         assertFalse(hashMap.isEmpty());
     }
 
-    @DisplayName("test Remove Work Correctly")
+    @DisplayName("test Remove Removes Mapping For A Key")
     @Test
-    public void testRemoveWorkCorrectly() {
+    public void testRemoveRemovesMappingForAKey() {
         hashMap.put("key1", "value1");
         hashMap.put("key2", "value2");
 
         assertEquals(2, hashMap.size());
+        assertEquals("value1", hashMap.remove("key1"));
         assertEquals("value2", hashMap.remove("key2"));
-        assertEquals(1, hashMap.size());
+        assertEquals(0, hashMap.size());
+        assertNull(hashMap.get("key1"));
+        assertNull(hashMap.get("key2"));
     }
 
     @DisplayName("test Remove Return Null When Key Not Exist")
     @Test
     public void testRemoveReturnNullWhenKeyNotExist() {
         hashMap.put("key1", "value1");
+
         assertNull(hashMap.remove("keyNotExist"));
     }
 
-    @DisplayName("test Contains Work Correctly")
+    @DisplayName("test Contains Return True When Key Exist")
     @Test
-    public void testContainsWorkCorrectly() {
+    public void testContainsReturnTrueWhenKeyExist() {
         hashMap.put("key1", "value1");
         hashMap.put("key2", "value2");
 
@@ -95,48 +105,84 @@ class HashMapTest {
     @Test
     public void testContainsThrowFalseWhenKeyNotExist() {
         hashMap.put("key1", "value1");
+
         assertFalse(hashMap.containsKey("key2"));
     }
 
-    @DisplayName("test Iterator Has Next Work Correctly")
+    // Iterator Test
+
+    @DisplayName("test Iterator Has Next Return True When Next Element Exist")
     @Test
-    public void testIteratorHasNextWorkCorrectly() {
+    public void testIteratorHasNextReturnTrueWhenNextElementExist() {
         hashMap.put("key1", "value1");
         hashMap.put("key2", "value2");
-        hashMap.put("key3", "value3");
-        Iterator<HashMap.Entry<String, String>> itr = hashMap.iterator();
 
-        assertTrue(itr.hasNext());
-    }
-
-    @DisplayName("test Iterator Next And Remove Work Correctly")
-    @Test
-    public void testIteratorNextAndRemoveWorkCorrectly() {
-        hashMap.put("key1", "value1");
-        hashMap.put("key2", "value2");
-        Iterator<HashMap.Entry<String, String>> itr = hashMap.iterator();
-
-        assertEquals(2, hashMap.size());
-        itr.next();
-        itr.remove();
-        assertEquals(1, hashMap.size());
-        assertFalse(hashMap.containsKey("key1"));
+        assertTrue(iterator.hasNext());
     }
 
 
     @DisplayName("test Iterator Has Next Return False When Next Element Not Exist")
     @Test
     public void testIteratorHasNextReturnFalseWhenNextElementNotExist() {
-        Iterator<HashMap.Entry<String, String>> itr = hashMap.iterator();
-        assertFalse(itr.hasNext());
+        assertFalse(iterator.hasNext());
     }
 
-    @DisplayName("test Iterator Next Throw Run Time Exception When Next Element Not Exist")
+    @DisplayName("test Iterator Next Return Next Element")
     @Test
-    public void testIteratorNextThrowRunTimeExceptionWhenNextElementNotExist() {
-        Iterator<HashMap.Entry<String, String>> itr = hashMap.iterator();
-        Assertions.assertThrows(RuntimeException.class, () -> {
-            itr.next();
+    public void testIteratorNextReturnNextElement() {
+        hashMap.put("key1", "value1");
+        hashMap.put("key2", "value2");
+        Iterator<HashMap.Entry<String, String>> iterator = hashMap.iterator();
+
+        HashMap.Entry<String, String> actual = iterator.next();
+        assertEquals("value1",actual.getValue());
+
+    }
+
+    @DisplayName("test Iterator Next Throw No Such Element When Map Is Empty")
+    @Test
+    public void testIteratorNextThrowNoSuchElementExceptionWhenMapEmpty() {
+        Assertions.assertThrows(NoSuchElementException.class, () -> {
+            iterator.next();
+        });
+    }
+
+    @DisplayName("test Iterator Remove Removes The Last Element Returned By This Iterator")
+    @Test
+    public void testIteratorRemoveRemovesTheLastElementReturnedByThisIterator() {
+        hashMap.put("key1", "value1");
+        hashMap.put("key2", "value2");
+
+        assertEquals(2, hashMap.size());
+        iterator.next();
+        iterator.remove();
+        iterator.next();
+        iterator.remove();
+        assertEquals(0, hashMap.size());
+    }
+
+    @DisplayName("test Iterator Remove Throw IllegalStateException When Method Has Already Been Called After The Last Call")
+    @Test
+    public void testIteratorRemoveThrowIllegalStateExceptionWhenMethodHasAlreadyBeenCalledAfterTheLastCall() {
+        hashMap.put("key1", "value1");
+        hashMap.put("key2", "value2");
+
+        iterator.next();
+        iterator.remove();
+
+        Assertions.assertThrows(IllegalStateException.class, () -> {
+            iterator.remove();
+        });
+    }
+
+    @DisplayName("test Iterator Remove Throw IllegalStateException If The Next Method Has Not Yet Been Called")
+    @Test
+    public void testIteratorRemoveThrowIllegalStateExceptionIfTheNextMethodHasNotYetBeenCalled() {
+        hashMap.put("key1", "value1");
+        hashMap.put("key2", "value2");
+
+        Assertions.assertThrows(IllegalStateException.class, () -> {
+            iterator.remove();
         });
     }
 }

@@ -1,8 +1,6 @@
 package com.stahovskyi.datastructures.queue;
 
-import java.util.Iterator;
-
-public interface Queue<T> {
+public interface Queue<T> extends Iterable<T> {
 
     void enqueue(T value);
 
@@ -19,6 +17,4 @@ public interface Queue<T> {
     void clear();
 
     String toString();
-
-    Iterator<T> iterator();
 }

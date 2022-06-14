@@ -1,6 +1,7 @@
 package com.stahovskyi.datastructures.stack;
 
 import java.util.Iterator;
+import java.util.NoSuchElementException;
 import java.util.Objects;
 
 public class LinkedStack<T> implements Stack<T> {
@@ -37,7 +38,6 @@ public class LinkedStack<T> implements Stack<T> {
 
     @Override
     public boolean contains(T value) {
-        emptyStackCheck();
         Node<T> current = top;
         while (current != null) {
             if (Objects.equals(current.value, value)) {
@@ -75,7 +75,7 @@ public class LinkedStack<T> implements Stack<T> {
         private Node<T> next;
         T value;
 
-        public Node(T value) {
+        private Node(T value) {
             this.value = value;
         }
     }
@@ -87,7 +87,7 @@ public class LinkedStack<T> implements Stack<T> {
 
     private class LinkedStackIterator implements Iterator<T> {
 
-        private boolean alreadyRemoved = true;
+        private boolean canRemove = true;
         private Node<T> current = top;
         private int index;
 
@@ -98,7 +98,7 @@ public class LinkedStack<T> implements Stack<T> {
         @Override
         public T next() {
             if (!hasNext()) {
-                throw new IllegalStateException(" Next Element Not Exist !");
+                throw new NoSuchElementException(" Next Element Not Exist !");
             }
             T returnValue = current.value;
             current = current.next;
@@ -108,71 +108,36 @@ public class LinkedStack<T> implements Stack<T> {
 
         @Override
         public void remove() {
-            if (!alreadyRemoved) {
-                throw new IllegalStateException(" Already Removed Element ! ");
-            }
-            if ( size > 1) {  // from first position
+            if (!canRemove) {
+                throw new IllegalStateException("Method Has Already Been Called After The Last Call Or Method Next Not Yet Been Called!");
+            } else if (size > 1) {  // from first position
                 for (int i = size - 1; i >= index + 1; i--) {
                     current = current.next;
                     if (i == index + 1) {
                         current.next = null;
                     }
                 }
-            }
-
-            if (size == 1) {  // with one element - ok !
+            } else if (size == 1) {  // with one element - ok !
                 current = null;
                 size--;
                 return;
-            }
-
-            if (index == size - 1) {  // last element
+            } else if (index == size - 1) {  // last element
                 current.next = top;
 
-            } else {
-                for (int i = size - 1; i >= index - 1; i--) {
-                    current = current.next;
-                    if (i == index - 1) {
-                        current = current.next.next;
+            }
+            for (int i = size - 1; i >= index - 1; i--) {
+                current = current.next;
+                if (i == index - 1) {
+                    current = current.next.next;
 
-                    }
                 }
             }
+
             size--;
-            alreadyRemoved = false;
+            canRemove = false;
         }
     }
-
 }
-//removeNode(current);
-
-       /* private void removeNode(Node<T> node) {
-            if (node == first) {  // from first position
-                current = current.prev;
-                current.prev = null;
-                size--;
-                return;
-            }
-            if (size == 1) {  // with one element - ok !
-                current = first = null;
-                size--;
-                return;
-            }
-            if (node == last) {  // last element
-                current.prev.next = null;
-                current = current.prev;
-                size--;
-                return;
-            } else {
-                                      // middle element
-                Node<T> prevNode = node.prev;
-                Node<T> nextNode = node.next;
-                prevNode.next = nextNode;
-                nextNode.prev = prevNode;
-
-            }
-            size--;
-        }*/
 
 
 

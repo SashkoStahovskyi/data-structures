@@ -1,6 +1,7 @@
 package com.stahovskyi.datastructures.queue;
 
 import java.util.Iterator;
+import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.StringJoiner;
 
@@ -11,7 +12,7 @@ public class LinkedQueue<T> implements Queue<T> {
 
     @Override
     public void enqueue(T value) {
-        Node<T> newNode = new Node<T>(value);
+        Node<T> newNode = new Node<>(value);
         if (isEmpty()) {
             head = newNode;
         } else {
@@ -26,7 +27,6 @@ public class LinkedQueue<T> implements Queue<T> {
 
     @Override
     public T dequeue() {
-        emptyQueueCheck();
         T value = head.value;
         head = head.next;
         size--;
@@ -35,7 +35,6 @@ public class LinkedQueue<T> implements Queue<T> {
 
     @Override
     public T peek() {
-        emptyQueueCheck();
         return head.value;
     }
 
@@ -51,7 +50,6 @@ public class LinkedQueue<T> implements Queue<T> {
 
     @Override
     public boolean contains(T value) {
-        emptyQueueCheck();
         Node<T> current = head;
         while (current != null) {
             if (Objects.equals(value, current.value)) {
@@ -71,26 +69,18 @@ public class LinkedQueue<T> implements Queue<T> {
     @Override
     public String toString() {
         StringJoiner stringJoiner = new StringJoiner(", ", "[ ", " ]");
-        Node<T> current = head;
-        while (current.value != null) {
-            stringJoiner.add(current.value.toString());
-            current = current.next;
+        for (T value : this) {
+            stringJoiner.add(String.valueOf(value));
         }
         return stringJoiner.toString();
     }
 
     private static class Node<T> {
-        private T value;
+        private final T value;
         private Node<T> next;
 
-        public Node(T value) {
+        private Node(T value) {
             this.value = value;
-        }
-    }
-
-    private void emptyQueueCheck() {
-        if (isEmpty()) {
-            throw new IllegalStateException(" Queue is empty !");
         }
     }
 
@@ -102,7 +92,7 @@ public class LinkedQueue<T> implements Queue<T> {
     private class LinkedQueueIterator implements Iterator<T> {
 
         private Node<T> current = head;
-        private boolean alreadyRemoved = true;
+        private boolean canRemove;
         private int index;
 
         public boolean hasNext() {
@@ -112,44 +102,45 @@ public class LinkedQueue<T> implements Queue<T> {
         @Override
         public T next() {
             if (!hasNext()) {
-                throw new IllegalStateException(" Next Element Not Exist !");
+                throw new NoSuchElementException(" Next Element Not Exist !");
             }
             T returnValue = current.value;
             current = current.next;
+            canRemove = true;
             index++;
             return returnValue;
         }
 
         @Override
         public void remove() {
-            if (!alreadyRemoved) {
-                throw new IllegalStateException(" Element Already Removed !");
-            }
-            if (size == 1) { // one element
+            if (!canRemove) {
+                throw new IllegalStateException("Method Has Already Been Called After The Last Call Or Method Next Not Yet Been Called!");
+
+            } else if (size == 1) {                     // one element
                 current = null;
-            }
-            if (index == 0 & size > 1) {  // first element
-                current = current.next;
-            }
-            if (index == size - 1) {  // last element
-                while (current.next != null) {
-                    current = null;
-                }
-            } else {
-                for (int i = 0; i < size - 1; i++) {
-                    if (i == index) {     // find node for delete
-                        Node<T> prevNode = head;
-                        for (int j = 0; j <= index - 1; j++) {
-                            prevNode = prevNode.next;
-                            if (j == index - 1) {
-                                prevNode = prevNode.next.next;
-                                current = null;
-                            }
-                        }
+
+            } else if (index - 1 == 0 & size > 1) {     // first element
+                head = current;
+
+            } else if (index - 1 == size - 1) {          // last element
+                Node<T> prevNode = head;
+                for (int i = 0; i <= index - 2; i++) {
+                    if (i == index - 2) {
+                        prevNode.next = null;
                     }
+                    prevNode = prevNode.next;
+                }
+
+            } else {                                     // middle position
+                for (int i = 0; i <= index - 2; i++) {
+                    Node<T> prevNode = head;
+                    if (i == index - 2) {
+                        prevNode.next = current;
+                    }
+                    prevNode = prevNode.next;
                 }
             }
-            alreadyRemoved = false;
+            canRemove = false;
             size--;
         }
     }

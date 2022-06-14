@@ -1,8 +1,6 @@
 package com.stahovskyi.datastructures.stack;
 
-import java.util.Iterator;
-
-public interface Stack <T> {
+public interface Stack <T> extends Iterable <T> {
 
     void push(T value) ;
 
@@ -17,7 +15,4 @@ public interface Stack <T> {
     boolean isEmpty();
 
     void clear();
-
-
-    Iterator<T> iterator();
 }

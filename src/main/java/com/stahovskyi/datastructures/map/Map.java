@@ -1,10 +1,8 @@
 package com.stahovskyi.datastructures.map;
 
-import java.util.Iterator;
+public interface Map<K, V> extends Iterable<HashMap.Entry<K, V>> {
 
-public interface Map<K, V> {
-
-    V put (K key,V value);
+    V put(K key, V value);
 
     V get(K key);
 
@@ -12,9 +10,7 @@ public interface Map<K, V> {
 
     boolean isEmpty();
 
-    V remove (K key);
+    V remove(K key);
 
     boolean containsKey(K key);
-
-    Iterator <HashMap.Entry<K, V>>  iterator();
 }

@@ -6,6 +6,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.util.Iterator;
+import java.util.NoSuchElementException;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -20,25 +21,29 @@ public abstract class AbstractStackTest {
 
     protected abstract Stack<String> getStack();
 
-    @DisplayName("test Push And Change Size Work Correctly")
+    @DisplayName("test Push Add New Element In Stack And Change Size")
     @Test
-    public void testPushAndChangeSizeWorkCorrectly() {
+    public void testPushAddNewElementInStackAndChangeSize() {
         assertEquals(0, stack.size());
         stack.push("B");
         stack.push("C");
         assertEquals(2, stack.size());
+        stack.contains("B");
+        stack.contains("C");
     }
 
-    @DisplayName("test Pop Work Correctly")
+    @DisplayName("test Pop Removes Element From Stack")
     @Test
-    public void testPopWorkCorrectly() {
+    public void testPopRemovesElementFromStack() {
+        stack.push("A");
         stack.push("B");
-        stack.push("C");
 
         assertEquals(2, stack.size());
-        assertEquals("C", stack.pop());
         assertEquals("B", stack.pop());
+        assertEquals("A", stack.pop());
         assertEquals(0, stack.size());
+        assertFalse(stack.contains("A"));
+        assertFalse(stack.contains("B"));
     }
 
     @DisplayName("test Pop Throw Illegal State Exception On Empty Stack")
@@ -49,14 +54,15 @@ public abstract class AbstractStackTest {
         });
     }
 
-    @DisplayName("test Peek Work Correctly")
+    @DisplayName("test Peek Returns The Head Of The Stack Without Removing It")
     @Test
-    public void testPeekWorkCorrectly() {
+    public void testPeekReturnsTheHeadOfTheStackWithoutRemovingIt() {
         stack.push("A");
         stack.push("B");
 
-        assertEquals(2, stack.size());
         assertEquals("B", stack.peek());
+        stack.pop();
+        assertEquals("A", stack.peek());
     }
 
     @DisplayName("test Peek Throw Illegal State Exception On Empty Stack")
@@ -67,15 +73,9 @@ public abstract class AbstractStackTest {
         });
     }
 
-    @DisplayName("test Is Empty Work Correctly")
+    @DisplayName("test Is Empty Return True When Stack Is Empty")
     @Test
-    public void testIsEmptyWorkCorrectly() {
-        assertTrue(stack.isEmpty());
-    }
-
-    @DisplayName("test Is Empty Return True On New Stack")
-    @Test
-    public void testIsEmptyReturnTrueOnNewStack() {
+    public void testIsEmptyReturnTrueWhenStackIsEmpty() {
         assertTrue(stack.isEmpty());
     }
 
@@ -96,35 +96,27 @@ public abstract class AbstractStackTest {
         assertTrue(stack.isEmpty());
     }
 
-    @DisplayName("test Contains Return True")
+    @DisplayName("test Contains Return True When Element Exist In Stack")
     @Test
-    public void testContainsReturnTrue() {
+    public void testContainsReturnTrueWhenElementExistInStack() {
         stack.push("A");
         stack.push("B");
 
         assertTrue(stack.contains("A"));
     }
 
-    @DisplayName("test Contains Return False")
+    @DisplayName("test Contains Return True When Element Not Exist In Stack")
     @Test
-    public void testContainsReturnFalse() {
+    public void testContainsReturnTrueWhenElementNotExistInStack() {
         stack.push("A");
         stack.push("B");
 
         assertFalse(stack.contains("H"));
     }
 
-    @DisplayName("test Contains Illegal State Exception False On Empty Stack")
+    @DisplayName("test Clear Removes All Element In Stack")
     @Test
-    public void testContainsReturnIllegalStateExceptionOnEmptyStack() {
-        Assertions.assertThrows(IllegalStateException.class, () -> {
-            stack.contains("H");
-        });
-    }
-
-    @DisplayName("test Clear Work Correctly")
-    @Test
-    public void testClearWorkCorrectly() {
+    public void testClearRemovesAllElementInStack() {
         stack.push("A");
         stack.push("B");
 
@@ -132,18 +124,26 @@ public abstract class AbstractStackTest {
         assertEquals(0, stack.size());
     }
 
-    //==========================
+    // ----- ITERATOR TEST ------ //
 
-    @DisplayName("test Iterator Has Next And Next Work Correctly")
+    @DisplayName("test Iterator Has Next Return True When Next Element Exist")
     @Test
-    public void testIteratorHasNextAndNextWorkCorrectly() {
+    public void testIteratorHasNextReturnTrueWhenNextElementExist() {
         stack.push("H");
         stack.push("B");
         Iterator<String> itr = stack.iterator();
 
         assertTrue(itr.hasNext());
+    }
+
+    @DisplayName("test Iterator Next Return Next Element In Stack")
+    @Test
+    public void testIteratorNextReturnNextElementInStack() {
+        stack.push("H");
+        stack.push("B");
+        Iterator<String> itr = stack.iterator();
+
         assertEquals("B", itr.next());
-        assertTrue(itr.hasNext());
         assertEquals("H", itr.next());
     }
 
@@ -154,11 +154,11 @@ public abstract class AbstractStackTest {
         assertFalse(itr.hasNext());
     }
 
-    @DisplayName("test Iterator Next Throw Run Time Exception When Next Element Not Exist")
+    @DisplayName("test Iterator Next Throw NoSuchElementException When Next Element Not Exist")
     @Test
     public void testIteratorNextThrowRunTimeExceptionWhenNextElementNotExist() {
         Iterator<String> itr = stack.iterator();
-        Assertions.assertThrows(RuntimeException.class, () -> {
+        Assertions.assertThrows(NoSuchElementException.class, () -> {
             itr.next();
         });
     }
@@ -210,7 +210,7 @@ public abstract class AbstractStackTest {
         assertFalse(stack.contains("A"));
     }
 
-    @DisplayName("test Iterator Remove One Element In Stack Work Correctly")
+    @DisplayName("test Iterator Remove One Element In Stack ")
     @Test
     public void testIteratorRemoveOneElementInStackWorkCorrectly() {
         stack.push("A");
@@ -220,19 +220,18 @@ public abstract class AbstractStackTest {
         itr.next();
         itr.remove();
         assertEquals(0, stack.size());
+        assertFalse(stack.contains("A"));
     }
 
-    @DisplayName("test Iterator Throw Illegal State Of Exception When Element Already Removed")
+    @DisplayName("test Iterator Remove Throw Illegal State Of Exception When Element Already Removed")
     @Test
     public void testIteratorThrowIllegalStateOfExceptionWhenElementAlreadyRemoved() {
         stack.push("A");
         stack.push("B");
         Iterator<String> itr = stack.iterator();
 
-        assertEquals(2, stack.size());
         itr.next();
         itr.remove();
-        assertEquals(1, stack.size());
 
         Assertions.assertThrows(IllegalStateException.class, () -> {
             itr.remove();

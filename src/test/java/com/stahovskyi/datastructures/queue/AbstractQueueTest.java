@@ -6,6 +6,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.util.Iterator;
+import java.util.NoSuchElementException;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -21,34 +22,29 @@ public abstract class AbstractQueueTest {
     protected abstract Queue<String> getQueue();
 
     @Test
-    @DisplayName(" test Enqueue Work Correctly")
-    public void testEnqueueWorkCorrectly() {
+    @DisplayName("test Enqueue enqueue New Element To The Queue And Change Size")
+    public void testEnqueueNewElementToTheQueueAndChangeSize() {
         queue.enqueue("A");
-        assertEquals(1, queue.size());
+        queue.enqueue("B");
+        assertEquals(2, queue.size());
     }
 
     @Test
-    @DisplayName(" test Dequeue Work Correctly")
-    public void testDequeueWorkCorrectly() {
+    @DisplayName("test Dequeue Removes Element From Queue")
+    public void testDequeueRemoveElementFromQueue() {
         queue.enqueue("A");
         queue.enqueue("B");
 
         assertEquals(2, queue.size());
         assertEquals("A", queue.dequeue());
         assertEquals(1, queue.size());
+        assertEquals("B", queue.dequeue());
+        assertEquals(0, queue.size());
     }
 
     @Test
-    @DisplayName(" test Dequeue Throw Illegal State Exception On Empty Queue")
-    public void testDequeueThrowIllegalStateExceptionOnEmptyQueue() {
-        Assertions.assertThrows(IllegalStateException.class, () -> {
-            queue.dequeue();
-        });
-    }
-
-    @Test
-    @DisplayName("test Peek Work Correctly")
-    public void testPeekWorkCorrectly() {
+    @DisplayName("test Peek Returns The Head Of The Queue Without Removing It")
+    public void testPeekReturnsTheHeadOfTheQueueWithoutRemovingIt() {
         queue.enqueue("A");
         queue.enqueue("B");
 
@@ -56,24 +52,17 @@ public abstract class AbstractQueueTest {
     }
 
     @Test
-    @DisplayName("test Peek Throw Illegal State Exception On Empty Queue")
-    public void testPeekThrowIllegalStateExceptionOnEmptyQueue() {
-        Assertions.assertThrows(IllegalStateException.class, () -> {
-            queue.peek();
-        });
-    }
-
-    @Test
-    @DisplayName(" test Size Work Correctly")
-    public void testSizeWorkCorrectly() {
+    @DisplayName("test Size Return Actual Size Of Queue")
+    public void testSizeReturnActualSizeOfQueue() {
         queue.enqueue("A");
-
         assertEquals(1, queue.size());
+        queue.enqueue("B");
+        assertEquals(2, queue.size());
     }
 
     @Test
-    @DisplayName("test Contains Return True")
-    public void testContainsReturnTrue() {
+    @DisplayName("test Contains Return True When Element Exist")
+    public void testContainsReturnTrueWhenElementExist() {
         queue.enqueue("A");
         queue.enqueue("B");
 
@@ -81,8 +70,8 @@ public abstract class AbstractQueueTest {
     }
 
     @Test
-    @DisplayName("test Contains Return False")
-    public void testContainsReturnFalse() {
+    @DisplayName("test Contains Return False When Element Not Exist")
+    public void testContainsReturnFalseWhenElementNotExist() {
         queue.enqueue("A");
         queue.enqueue("B");
 
@@ -90,16 +79,8 @@ public abstract class AbstractQueueTest {
     }
 
     @Test
-    @DisplayName("test Contains Throw Illegal State Exception When Queue Is Empty")
-    public void testContainsThrowIllegalStateExceptionWhenQueueIsEmpty() {
-        Assertions.assertThrows(IllegalStateException.class, () -> {
-            queue.contains("W");
-        });
-    }
-
-    @Test
-    @DisplayName("test Is Empty And Clear Work Correctly")
-    public void testIsEmptyAndClearWorkCorrectly() {
+    @DisplayName("test Is Empty Return True When Queue Is Empty After Clear")
+    public void testIsEmptyReturnTrueWhenQueueIsEmptyAfterDequeue() {
         queue.enqueue("A");
 
         assertEquals(1, queue.size());
@@ -109,8 +90,8 @@ public abstract class AbstractQueueTest {
     }
 
     @Test
-    @DisplayName("test Is Empty False On Queue With Data")
-    public void testIsEmptyFalseOnQueueWithData() {
+    @DisplayName("test Is Empty Return False On Queue With Data")
+    public void testIsEmptyReturnFalseOnQueueWithData() {
         queue.enqueue("Q");
         queue.enqueue("Q");
 
@@ -118,23 +99,27 @@ public abstract class AbstractQueueTest {
     }
 
     @Test
-    @DisplayName("test Is Empty True On Queue After Clear")
-    public void testIsEmptyTrueOnQueueAfterClear() {
-        queue.enqueue("Q");
-        queue.enqueue("Q");
+    @DisplayName("test Is Empty Return True On New Queue")
+    public void testIsEmptyReturnTrueOnNewQueue() {
+        assertTrue(queue.isEmpty());
+    }
 
+
+    @Test
+    @DisplayName("test Clear Removes All Element From Queue")
+    public void testClearRemovesAllElementFromQueue() {
+        queue.enqueue("A");
+        queue.enqueue("B");
+
+        assertEquals(2, queue.size());
         queue.clear();
-        assertTrue(queue.isEmpty());
+        assertEquals(0, queue.size());
     }
 
-    @Test
-    @DisplayName("test Is Empty True On New Queue")
-    public void testIsEmptyTrueOnNewQueue() {
-        assertTrue(queue.isEmpty());
-    }
 
+    @DisplayName("test To String Create String Of Element Of This List")
     @Test
-    public void testToString() {
+    public void testToStringCreateStringOfElementOfThisList() {
         queue.enqueue("A");
         queue.enqueue("B");
         queue.enqueue("C");
@@ -144,66 +129,74 @@ public abstract class AbstractQueueTest {
         assertEquals(expected, actual);
     }
 
+    // ----  ITERATOR TEST  --- //
+
+    @DisplayName("test Iterator Has Next Return True When Next Element Exist")
     @Test
-    @DisplayName("test Iterator Has Next Work Correctly")
-    public  void testHasNextWorkCorrectly() {
+    public void testIteratorHasNextReturnTrueWhenNextElementExist() {
         queue.enqueue("A");
         queue.enqueue("B");
-        Iterator<String> itr = queue.iterator();
+        Iterator<String> iterator = queue.iterator();
 
-        assertTrue(itr.hasNext());
+        assertTrue(iterator.hasNext());
     }
 
+    @DisplayName("test Iterator Has Next Return False When Next Element Not Exist")
     @Test
-    @DisplayName("test Iterator Next Work Correctly")
-    public  void testNextWorkCorrectly() {
+    public void testIteratorHasNextReturnFalseWhenNextElementNotExist() {
+        Iterator<String> iterator = queue.iterator();
+        assertFalse(iterator.hasNext());
+    }
+
+    @DisplayName("test Iterator Next Return Next Element")
+    @Test
+    public void testIteratorNextReturnNextElement() {
         queue.enqueue("A");
         queue.enqueue("B");
-        Iterator<String> itr = queue.iterator();
+        Iterator<String> iterator = queue.iterator();
 
-        assertEquals("A",itr.next());
-        assertEquals("B",itr.next());
+        assertEquals("A", iterator.next());
+        assertEquals("B", iterator.next());
     }
 
+    @DisplayName("test Iterator Next Throw No Such Element Exception When Next Element Not Exist")
     @Test
-    @DisplayName("test Iterator Next Throw IllegalState Exception When Next Element Not Exist")
-    public void testIteratorNextThrowIllegalStateExceptionWhenNextElementNotExist() {
+    public void testIteratorNextThrowNoSuchElementExceptionWhenNextElementNotExist() {
         queue.enqueue("A");
-        Iterator<String> itr = queue.iterator();
+        Iterator<String> iterator = queue.iterator();
 
-        assertEquals("A",itr.next());
-        Assertions.assertThrows(IllegalStateException.class, () -> {
-            itr.next();
+        assertEquals("A", iterator.next());
+        Assertions.assertThrows(NoSuchElementException.class, () -> {
+            iterator.next();
         });
     }
 
-    @DisplayName("test Iterator Remove From List With One Element")
+    @DisplayName("test Iterator Remove From Queue With One Element")
     @Test
-    public void testIteratorRemoveFromListWithOneElement() {
+    public void testIteratorRemoveFromQueueWithOneElement() {
         queue.enqueue("A");
-        Iterator<String> itr = queue.iterator();
+        Iterator<String> iterator = queue.iterator();
 
         assertEquals(1, queue.size());
-        itr.next();
-        itr.remove();
+        iterator.next();
+        iterator.remove();
         assertEquals(0, queue.size());
     }
 
-
-    @DisplayName("test Iterator Remove From Head Position")
+    @DisplayName("test Iterator Remove Element From Head Position")
     @Test
-    public void testIteratorRemoveFromHeadPosition() {
+    public void testIteratorRemoveElementFromHeadPosition() {
         queue.enqueue("A");
         queue.enqueue("B");
-        Iterator<String> itr = queue.iterator();
+        Iterator<String> iterator = queue.iterator();
 
         assertEquals(2, queue.size());
-        itr.next();
-        itr.remove();
+        iterator.next();
+        iterator.remove();
         assertEquals(1, queue.size());
         assertFalse(queue.contains("A"));
+        assertTrue(queue.contains("B"));
     }
-
 
     @DisplayName("test Iterator Remove From Middle Position")
     @Test
@@ -211,13 +204,15 @@ public abstract class AbstractQueueTest {
         queue.enqueue("A");
         queue.enqueue("B");
         queue.enqueue("C");
-        Iterator<String> itr = queue.iterator();
+        Iterator<String> iterator = queue.iterator();
 
         assertEquals(3, queue.size());
-        itr.next();
-        itr.next();
-        itr.remove();
+        iterator.next();
+        iterator.next();
+        iterator.remove();
         assertEquals(2, queue.size());
+        assertTrue(queue.contains("A"));
+        assertTrue(queue.contains("C"));
         assertFalse(queue.contains("B"));
     }
 
@@ -227,31 +222,45 @@ public abstract class AbstractQueueTest {
         queue.enqueue("A");
         queue.enqueue("B");
         queue.enqueue("C");
-        Iterator<String> itr = queue.iterator();
+        Iterator<String> iterator = queue.iterator();
 
         assertEquals(3, queue.size());
-        itr.next();
-        itr.next();
-        itr.next();
-        itr.remove();
+        iterator.next();
+        iterator.next();
+        iterator.next();
+        iterator.remove();
         assertEquals(2, queue.size());
+        assertTrue(queue.contains("A"));
+        assertTrue(queue.contains("B"));
         assertFalse(queue.contains("C"));
     }
 
-    @DisplayName("test Iterator Throw Illegal State Of Exception When Element Already Removed")
+    @DisplayName("test Iterator Remove Throw IllegalStateException When Method Has Already Been Called After The Last Call")
     @Test
-    public void testIteratorThrowIllegalStateOfExceptionWhenElementAlreadyRemoved() {
+    public void testIteratorRemoveThrowIllegalStateExceptionWhenMethodHasAlreadyBeenCalledAfterTheLastCall() {
         queue.enqueue("A");
         queue.enqueue("B");
-        Iterator<String> itr = queue.iterator();
+        Iterator<String> iterator = queue.iterator();
 
         assertEquals(2, queue.size());
-        itr.next();
-        itr.remove();
+        iterator.next();
+        iterator.remove();
         assertEquals(1, queue.size());
 
         Assertions.assertThrows(IllegalStateException.class, () -> {
-            itr.remove();
+            iterator.remove();
+        });
+    }
+
+    @DisplayName("test Iterator Remove Throw IllegalStateException If The Next Method Has Not Yet Been Called")
+    @Test
+    public void testIteratorRemoveThrowIllegalStateExceptionIfTheNextMethodHasNotYetBeenCalled() {
+        queue.enqueue("A");
+        queue.enqueue("B");
+        Iterator<String> iterator = queue.iterator();
+
+        Assertions.assertThrows(IllegalStateException.class, () -> {
+            iterator.remove();
         });
     }
 }
