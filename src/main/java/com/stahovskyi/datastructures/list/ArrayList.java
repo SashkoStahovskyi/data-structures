@@ -119,7 +119,7 @@ public class ArrayList<T> implements List<T> {
         if (array.length == size) {
             @SuppressWarnings("unchecked")
             T[] newArray = (T[]) new Object[(int) (array.length * DEFAULT_GROW_FACTOR) + 1];
-            System.arraycopy(array, 0, newArray, 0, size);
+            System.arraycopy(array, 0, newArray, 0, size );
             array = newArray;
         }
     }

@@ -21,10 +21,9 @@ class HashMapTest {
         iterator = hashMap.iterator();
     }
 
-    @DisplayName("test Put Add New Value And Change Size Work Correctly")
+    @DisplayName("test Put Add New Entry In Bucket By Specified Key")
     @Test
-    public void testPutAddNewValueAndChangeSizeWorkCorrectly() {
-        assertEquals(0, hashMap.size());
+    public void testPutAddNewEntryInBucketBySpecifiedKey() {
         hashMap.put("key1", "value1");
         hashMap.put("key2", "value2");
 
@@ -33,9 +32,9 @@ class HashMapTest {
         assertEquals("value2", hashMap.get("key2"));
     }
 
-    @DisplayName("test Put Replace Exist Value On New Value")
+    @DisplayName("test Put Replace Old Value On New Value If The Map Previously Contained A Mapping For This Key")
     @Test
-    public void testPutReplaceExistValueOnNewValue() {
+    public void testPutReplaceOldValueOnNewValueIfTheMapPreviouslyContainedAMappingForThisKey() {
         hashMap.put("key1", "value1");
         hashMap.put("key2", "oldValue");
 
@@ -43,36 +42,54 @@ class HashMapTest {
         assertEquals("newValue", hashMap.get("key2"));
     }
 
-    @DisplayName("tes Get Returns The Value To Which The Specified Key Is Mapped")
+    @DisplayName("test Put Return Null If There Was No Mapping For Key")
     @Test
-    public void tesGetReturnsTheValueToWhichTheSpecifiedKeyIsMapped() {
+    public void testPutReturnNullIfThereWasNoMappingForKey() {
+        hashMap.put("key1", "value1");
+        hashMap.put("key2", "value2");
+
+        assertNull(hashMap.put("notExistKey", "value"));
+    }
+
+    @DisplayName("test Get Returns Value Which Corresponding To This Entry")
+    @Test
+    public void testGetReturnsValueWhichCorrespondingToThisEntry() {
         hashMap.put("key1", "value1");
         hashMap.put("key2", "value2");
         assertEquals("value2", hashMap.get("key2"));
     }
 
-    @DisplayName("test Get Return Null When Key Not Exist")
+    @DisplayName("test Get Return Null When Specified Key Not Exist")    // method get return Null ??
     @Test
-    public void testGetReturnNullWhenKeyNotExist() {
+    public void testGetReturnNullWhenSpecifiedKeyNotExist() {
         assertNull(hashMap.get("key1"));
     }
 
-    @DisplayName("test Is Empty Return True When Map IS Empty")
+    @DisplayName("test Size Returns The Number Of Entry Mappings In This Map")
     @Test
-    public void testIsEmptyReturnTrueWhenMapISEmpty() {
+    public void testSizeReturnsTheNumberOfEntryMappingsInThisMap() {
+        hashMap.put("key1", "value1");
+        hashMap.put("key2", "value2");
+
+        assertEquals(2, hashMap.size());
+    }
+
+    @DisplayName("test IsEmpty Returns True If This Map Contains No Entry Mappings")
+    @Test
+    public void testReturnsIsEmptyTrueIfThisMapContainsNoEntryMappings() {
         assertTrue(hashMap.isEmpty());
     }
 
-    @DisplayName("test Is Empty Return False On Map With Data")
+    @DisplayName("test IsEmpty Returns False If This Map Contains Entry Mappings")
     @Test
-    public void testIsEmptyReturnFalseOnMapWithData() {
+    public void testIsEmptyReturnsFalseIfThisMapContainsEntryMappings() {
         hashMap.put("key1", "value1");
         assertFalse(hashMap.isEmpty());
     }
 
-    @DisplayName("test Remove Removes Mapping For A Key")
+    @DisplayName("test Remove Removes Mapping For A Key From This Map And Return Removed Value Associated With This Key")
     @Test
-    public void testRemoveRemovesMappingForAKey() {
+    public void testRemoveRemovesMappingForAKeyFromThisMaAndReturnRemovedValueAssociatedWithThisKey() {
         hashMap.put("key1", "value1");
         hashMap.put("key2", "value2");
 
@@ -80,36 +97,78 @@ class HashMapTest {
         assertEquals("value1", hashMap.remove("key1"));
         assertEquals("value2", hashMap.remove("key2"));
         assertEquals(0, hashMap.size());
-        assertNull(hashMap.get("key1"));
-        assertNull(hashMap.get("key2"));
+        assertFalse(hashMap.containsKey("key1"));
+        assertFalse(hashMap.containsKey("key2"));
     }
 
-    @DisplayName("test Remove Return Null When Key Not Exist")
+    @DisplayName("test Remove Removes Entry From Bucket ")
     @Test
-    public void testRemoveReturnNullWhenKeyNotExist() {
+    public void testRemoveRemovesEntryFromBucket () {
+        hashMap.put("key1", "value1");
+        hashMap.put("key2", "value2");
+        hashMap.put("key3", "value2");
+        hashMap.put("key4", "value2");
+        hashMap.put("key5", "value2");
+        hashMap.put("key6", "value2");
+        hashMap.put("key7", "value2");
+        hashMap.put("key8", "value2");
+        hashMap.put("key9", "value2");
+        hashMap.put("key10", "value222");
+
+        assertEquals(10, hashMap.size());
+
+        assertEquals("value222", hashMap.remove("key10"));
+        assertEquals(9, hashMap.size());
+        assertFalse(hashMap.containsKey("key10"));
+    }
+
+    @DisplayName("test Remove Return Null When No Mapping In Map For This Key")
+    @Test
+    public void testRemoveReturnNullWhenNoMappingInMapForThisKey() {
         hashMap.put("key1", "value1");
 
-        assertNull(hashMap.remove("keyNotExist"));
+        assertNull(hashMap.remove("NotExist"));
     }
 
-    @DisplayName("test Contains Return True When Key Exist")
+    @DisplayName("test Returns True If This Map Contains A Mapping For The Specified Key")
     @Test
-    public void testContainsReturnTrueWhenKeyExist() {
+    public void testReturnsTrueIfThisMapContainsAMappingForTheSpecifiedKey() {
         hashMap.put("key1", "value1");
         hashMap.put("key2", "value2");
 
         assertTrue(hashMap.containsKey("key2"));
     }
 
-    @DisplayName("test Contains Throw False When Key Not Exist")
+    @DisplayName("test Contains Returns False If This Map No Contains A Mapping For The Specified Key")
     @Test
-    public void testContainsThrowFalseWhenKeyNotExist() {
+    public void testContainsReturnsFalseIfThisMapNoContainsAMappingForTheSpecifiedKey() {
         hashMap.put("key1", "value1");
 
         assertFalse(hashMap.containsKey("key2"));
     }
 
-    // Iterator Test
+    @DisplayName("test GrowIfNeeded Change The Number Of Bucket In Buckets Array")
+    @Test
+    public void testGrowIfNeededChangeTheNumberOfBucketInBucketsArray() {
+        hashMap.
+
+    }
+
+   /* @DisplayName("test To String Create String Of Element Of This List")
+    @Test
+    public void testToStringCreateStringOfElementOfThisList() {
+        hashMap.put("key1", "value1");
+        hashMap.put("key2", "value2");
+
+        String expected = "[ A, B, C ]";
+        String actual = hashMap.();
+        assertEquals(expected, actual);
+
+        HashMap.Entry<String, String> actualFirst = hashMap.();
+        assertEquals("value1", actualFirst.getValue());
+    }
+*/
+    // ------------- Iterator Test  --------------- //
 
     @DisplayName("test Iterator Has Next Return True When Next Element Exist")
     @Test
@@ -134,14 +193,16 @@ class HashMapTest {
         hashMap.put("key2", "value2");
         Iterator<HashMap.Entry<String, String>> iterator = hashMap.iterator();
 
-        HashMap.Entry<String, String> actual = iterator.next();
-        assertEquals("value1",actual.getValue());
+        HashMap.Entry<String, String> actualFirst = iterator.next();
+        assertEquals("value1", actualFirst.getValue());
 
+        HashMap.Entry<String, String> actualSecond = iterator.next();
+        assertEquals("value2", actualSecond.getValue());
     }
 
-    @DisplayName("test Iterator Next Throw No Such Element When Map Is Empty")
+    @DisplayName("test Iterator Next Throw No Such Element Exception If Next Element Not Exist")
     @Test
-    public void testIteratorNextThrowNoSuchElementExceptionWhenMapEmpty() {
+    public void testIteratorNextThrowNoSuchElementExceptionIfNextElementNotExist() {
         Assertions.assertThrows(NoSuchElementException.class, () -> {
             iterator.next();
         });
@@ -185,6 +246,11 @@ class HashMapTest {
             iterator.remove();
         });
     }
+
+    // ---------- Test For Private Methods ---------- //
+
+
+
 }
 
 

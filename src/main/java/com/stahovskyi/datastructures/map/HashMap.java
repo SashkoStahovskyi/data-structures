@@ -4,28 +4,31 @@ import java.util.*;
 
 public class HashMap<K, V> implements Map<K, V> {
 
-    private static final int DEFAULT_INITIAL_CAPACITY = 5;
+    private static final int DEFAULT_INITIAL_CAPACITY = 5; // when finish change to 10
+    private static final int DEFAULT_GROW_FACTOR = 2;
+    private static final double DEFAULT_LOAD_FACTOR = 0.75;
     private int size;
-    private final List<Entry<K, V>>[] buckets;
+    private List<Entry<K, V>>[] buckets;
 
+    @SuppressWarnings("unchecked")
     public HashMap() {
         buckets = new ArrayList[DEFAULT_INITIAL_CAPACITY];
         for (int i = 0; i < buckets.length; i++) {
-            buckets[i] = new ArrayList();
+            buckets[i] = new ArrayList<>();
         }
     }
 
     @Override
     public V put(K key, V value) {
+        growIfNeeded();
         Entry<K, V> entry = getEntry(key);
         if (entry != null) {
             V returnValue = entry.value;
             entry.value = value;
             return returnValue;
         }
-        int index = getIndex(key);
-        List<Entry<K, V>> list = buckets[index];
-        list.add(new Entry<K, V>(key, value));
+        List<Entry<K, V>> list = getBucket(key);
+        list.add(new Entry<>(key, value));
         size++;
         return null;
     }
@@ -46,21 +49,21 @@ public class HashMap<K, V> implements Map<K, V> {
 
     @Override
     public boolean isEmpty() {
-        if (size == 0) {
-            return true;
-        }
-        return false;
+        return size == 0;
     }
 
     @Override
     public V remove(K key) {
-        int index = getIndex(key);
-        Entry<K, V> entry = getEntry(key);
-        if (entry != null) {
-            V returnEntry = entry.value;
-            buckets[index] = null;
-            size--;
-            return returnEntry;
+        List<Entry<K, V>> bucket = getBucket(key);
+        Iterator<Entry<K, V>> iterator = bucket.iterator();
+        for (Entry<K, V> entry : this ) {
+            Entry<K, V> e = iterator.next();
+            if (Objects.equals(e.key, key)) {
+                V returnValue = e.value;
+                iterator.remove();
+                size--;
+                return returnValue;
+            }
         }
         return null;
     }
@@ -79,15 +82,26 @@ public class HashMap<K, V> implements Map<K, V> {
         return stringJoiner.toString();
     }
 
-    private int getIndex(K key) {
+  // @VisibleForTesting  // assertj         // change for private    !!!!!!!!!!!!
+     public void growIfNeeded() {
+        if (buckets.length * DEFAULT_LOAD_FACTOR < size) {
+            int newBucketCount = DEFAULT_INITIAL_CAPACITY * DEFAULT_GROW_FACTOR;
+            List<Entry<K, V>>[] newBuckets = new ArrayList[newBucketCount];
+            System.arraycopy(buckets, 0, newBuckets, 0, size);
+            buckets = newBuckets;
+        }
+    }
+
+   /* @VisibleForTesting  */        //  <--- ??????
+    public int getIndex(K key) {
         int hashCode = key.hashCode();
         return Math.abs(hashCode) % buckets.length;
     }
 
+    // annotation
     private Entry<K, V> getEntry(K key) {
-        int index = getIndex(key);
-        List<Entry<K, V>> list = buckets[index];
-        if (list != null) {
+        List<Entry<K, V>> list = getBucket(key);
+        if (list != null) {                  // need check for null ??
             for (Entry<K, V> entry : list) {
                 if (Objects.equals(entry.key, key)) {
                     return entry;
@@ -97,7 +111,12 @@ public class HashMap<K, V> implements Map<K, V> {
         return null;
     }
 
-    static class Entry<K, V> {   // ??? private  ????
+    private List<Entry<K, V>> getBucket(K key) {
+        int index = getIndex(key);
+        return buckets[index];
+    }
+
+    static class Entry<K, V> {   // ??? private   override toString ????
 
         private final K key;
         private V value;
@@ -131,7 +150,7 @@ public class HashMap<K, V> implements Map<K, V> {
         @Override
         public Entry<K, V> next() {
             if (!hasNext()) {
-                throw new NoSuchElementException(" Not exist next element !");
+                throw new NoSuchElementException(" Next Element Not Exist ! ");
             }
             while (true) {
                 List<Entry<K, V>> currentBucket = buckets[bucketIndex];
