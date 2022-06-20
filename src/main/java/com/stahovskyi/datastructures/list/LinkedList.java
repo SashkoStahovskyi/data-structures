@@ -221,7 +221,7 @@ public class LinkedList<T> implements List<T> {
         @Override
         public void remove() {
             if (!canRemove) {
-                throw new IllegalStateException("Method Has Already Been Called After The Last Call Or Method Next Not Yet Been Called!");
+                throw new IllegalStateException(" Method Has Already Been Called After The Last Call Or Method Next Not Yet Been Called! ");
             }
             removeNode(current);
             canRemove = false;

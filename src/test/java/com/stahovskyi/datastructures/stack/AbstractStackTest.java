@@ -163,9 +163,9 @@ public abstract class AbstractStackTest {
         });
     }
 
-    @DisplayName("test Iterator Remove From Last Position Work Correctly")
+    @DisplayName("test Iterator Remove Removes Element From Last Position")
     @Test
-    public void testIteratorRemoveFromLastPositionWorkCorrectly() {
+    public void testIteratorRemoveRemovesElementFromLastPosition() {
         stack.push("A");
         stack.push("B");
         Iterator<String> itr = stack.iterator();
@@ -175,13 +175,13 @@ public abstract class AbstractStackTest {
         itr.next();
         itr.remove();
         assertEquals(1, stack.size());
-        assertFalse(stack.contains("B"));
+        assertFalse(stack.contains("A"));
 
     }
 
-    @DisplayName("test Iterator Remove From Middle Position Work Correctly")
+    @DisplayName("test Iterator Remove Removes Element From Middle Position")
     @Test
-    public void testIteratorRemoveFromMiddlePositionWorkCorrectly() {
+    public void testIteratorRemoveRemovesElementFromMiddlePosition() {
         stack.push("A");
         stack.push("B");
         stack.push("C");
@@ -195,24 +195,23 @@ public abstract class AbstractStackTest {
         assertFalse(stack.contains("B"));
     }
 
-    @DisplayName("test Iterator Remove From First Position Work Correctly")
+    @DisplayName("test Iterator Remove Removes Element From First Position Work Correctly")
     @Test
-    public void testIteratorRemoveFromFirstPositionWorkCorrectly() {
+    public void testIteratorRemoveRemovesElementFromFirstPositionWorkCorrectly() {
         stack.push("A");
         stack.push("B");
         Iterator<String> itr = stack.iterator();
 
         assertEquals(2, stack.size());
         itr.next();
-        itr.next();
         itr.remove();
         assertEquals(1, stack.size());
-        assertFalse(stack.contains("A"));
+        assertFalse(stack.contains("B"));
     }
 
-    @DisplayName("test Iterator Remove One Element In Stack ")
+    @DisplayName("test Iterator Remove One Element In Stack")
     @Test
-    public void testIteratorRemoveOneElementInStackWorkCorrectly() {
+    public void testIteratorRemoveOneElementInStack() {
         stack.push("A");
         Iterator<String> itr = stack.iterator();
 
@@ -223,16 +222,15 @@ public abstract class AbstractStackTest {
         assertFalse(stack.contains("A"));
     }
 
-    @DisplayName("test Iterator Remove Throw Illegal State Of Exception When Element Already Removed")
+    @DisplayName("test Iterator Remove Throw IllegalStateException When Method Has Already Been Called After The Last Call")
     @Test
-    public void testIteratorThrowIllegalStateOfExceptionWhenElementAlreadyRemoved() {
+    public void testIteratorRemoveThrowIllegalStateExceptionWhenMethodHasAlreadyBeenCalledAfterTheLastCall() {
         stack.push("A");
         stack.push("B");
         Iterator<String> itr = stack.iterator();
 
         itr.next();
         itr.remove();
-
         Assertions.assertThrows(IllegalStateException.class, () -> {
             itr.remove();
         });

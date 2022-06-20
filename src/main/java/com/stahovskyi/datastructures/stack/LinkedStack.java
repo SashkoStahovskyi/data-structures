@@ -73,7 +73,7 @@ public class LinkedStack<T> implements Stack<T> {
     private static class Node<T> {
 
         private Node<T> next;
-        T value;
+        private T value;
 
         private Node(T value) {
             this.value = value;
@@ -107,29 +107,30 @@ public class LinkedStack<T> implements Stack<T> {
         }
 
         @Override
-        public void remove() {
+        public void remove() {   // FIXME last position need fix
             if (!canRemove) {
                 throw new IllegalStateException("Method Has Already Been Called After The Last Call Or Method Next Not Yet Been Called!");
-            } else if (size > 1) {  // from first position
-                for (int i = size - 1; i >= index + 1; i--) {
-                    current = current.next;
-                    if (i == index + 1) {
-                        current.next = null;
+
+            } else if (size == 1) {                     // one element
+                top = null;
+            } else if (index - 1 == 0 & size > 1) {     // first position
+                top = top.next;
+
+            } else if (index - 1 == size - 1) {          // last position
+                Node<T> currentNode = top;
+                for (int i = size - 1; i >= 0; i--) {
+                    currentNode = currentNode.next;
+                    if (i == 0) {
+                        currentNode = null;
                     }
                 }
-            } else if (size == 1) {  // with one element - ok !
-                current = null;
-                size--;
-                return;
-            } else if (index == size - 1) {  // last element
-                current.next = top;
 
-            }
-            for (int i = size - 1; i >= index - 1; i--) {
-                current = current.next;
-                if (i == index - 1) {
-                    current = current.next.next;
-
+            } else {                                     // middle position
+                for (int i = 0; i <= index - 2; i++) {
+                    Node<T> prevNode = top;
+                    if (i == index - 2) {
+                        prevNode.next = current;
+                    }
                 }
             }
 

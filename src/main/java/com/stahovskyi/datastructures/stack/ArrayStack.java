@@ -3,8 +3,10 @@ package com.stahovskyi.datastructures.stack;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
+import java.util.Objects;
 
 public class ArrayStack<T> implements Stack<T> {
+
     private final int DEFAULT_INITIAL_CAPACITY = 10;
     private final double DEFAULT_ENSURE_CAPACITY = 1.5;
     private int size;
@@ -40,7 +42,7 @@ public class ArrayStack<T> implements Stack<T> {
     public boolean contains(T value) {
         for (int i = 0; i < size; i++) {
             T valueInStack = array[i];
-            if (value.equals(valueInStack)) {
+            if (Objects.equals(value, valueInStack)) {
                 return true;
             }
         }
@@ -85,11 +87,12 @@ public class ArrayStack<T> implements Stack<T> {
 
     private class ArrayStackIterator implements Iterator<T> {
 
-        private int index;
-        private boolean canRemove = true;
+        private boolean canRemove;
+        private int index = size - 1;
+
 
         public boolean hasNext() {
-            return index < size;
+            return size > 0;
         }
 
         @Override
@@ -97,8 +100,9 @@ public class ArrayStack<T> implements Stack<T> {
             if (!hasNext()) {
                 throw new NoSuchElementException(" Next Element Not Exist !");
             }
-            T result = array[size - 1];
-            size--;
+            T result = array[index];
+            index--;
+            canRemove = true;
             return result;
         }
 
@@ -107,8 +111,11 @@ public class ArrayStack<T> implements Stack<T> {
             if (!canRemove) {
                 throw new IllegalStateException("Method Has Already Been Called After The Last Call Or Method Next Not Yet Been Called!");
             }
-            System.arraycopy(array, index, array, index - 1, size - index);
-            array[size - 1] = null;
+            if (size == 1) {    // one element
+                array[size - 1] = null;
+            }
+            array[index + 1] = null;
+            //System.arraycopy(array, index + 1, array, index, size );  // FIXME array must change index of element after remove element
             size--;
             canRemove = false;
         }

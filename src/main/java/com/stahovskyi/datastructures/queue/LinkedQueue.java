@@ -114,7 +114,7 @@ public class LinkedQueue<T> implements Queue<T> {
         @Override
         public void remove() {
             if (!canRemove) {
-                throw new IllegalStateException("Method Has Already Been Called After The Last Call Or Method Next Not Yet Been Called!");
+                throw new IllegalStateException(" Method Has Already Been Called After The Last Call Or Method Next Not Yet Been Called! ");
 
             } else if (size == 1) {                     // one element
                 current = null;
@@ -137,7 +137,6 @@ public class LinkedQueue<T> implements Queue<T> {
                     if (i == index - 2) {
                         prevNode.next = current;
                     }
-                    prevNode = prevNode.next;
                 }
             }
             canRemove = false;
