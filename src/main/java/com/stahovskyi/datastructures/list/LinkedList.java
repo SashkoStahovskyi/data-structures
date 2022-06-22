@@ -202,6 +202,7 @@ public class LinkedList<T> implements List<T> {
 
         private Node<T> current = head;
         private boolean canRemove;
+        private int index = 0;
 
         public boolean hasNext() {
             return current != null;
@@ -214,6 +215,7 @@ public class LinkedList<T> implements List<T> {
             }
             T returnValue = current.value;
             current = current.next;
+            index++;
             canRemove = true;
             return returnValue;
         }
@@ -223,7 +225,7 @@ public class LinkedList<T> implements List<T> {
             if (!canRemove) {
                 throw new IllegalStateException(" Method Has Already Been Called After The Last Call Or Method Next Not Yet Been Called! ");
             }
-            removeNode(current);
+            LinkedList.this.remove(index - 1);
             canRemove = false;
         }
     }
