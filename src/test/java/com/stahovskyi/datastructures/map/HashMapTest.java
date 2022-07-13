@@ -32,9 +32,9 @@ class HashMapTest {
         assertEquals("value2", hashMap.get("key2"));
     }
 
-    @DisplayName("test Method Put Change Size When Default Buckets Size Is Almost Full And Size Must Grow")
+    @DisplayName("test Method Put Add New Entry Until Default Capacity Is Full And Capacity Grow Then Checks Whether A New Entry Can Be Added To The Enlarged Capacity")
     @Test
-    public void testMethodPutChangeSizeWhenDefaultBucketsSizeIsAlmostFullAndSizeMustGrow() {
+    public void testMethodPutAddNewEntryUntilDefaultCapacityIsFullAndCapacityGrowThenChecksWhetherANewEntryCanBeAddedToTheEnlargedCapacity() {
         hashMap.put("key1", "value1");
         hashMap.put("key2", "value2");
         hashMap.put("key3", "value3");
@@ -42,11 +42,16 @@ class HashMapTest {
         hashMap.put("key5", "value5");
         hashMap.put("key6", "value6");
         hashMap.put("key7", "value7");
+        hashMap.put("key8", "value8");
+        assertEquals(8, hashMap.size());
+        hashMap.put("key9", "value9");
+        hashMap.put("key10", "value10");
+        hashMap.put("key11", "value11");
+        hashMap.put("key12", "value12");
+        assertEquals(12, hashMap.size());
 
-        assertEquals(7, hashMap.size());
-        assertEquals("value1", hashMap.get("key1"));
-        assertEquals("value5", hashMap.get("key5"));
-        assertEquals("value7", hashMap.get("key7"));
+        assertEquals("value8", hashMap.get("key8"));
+        assertEquals("value12", hashMap.get("key12"));
     }
 
     @DisplayName("test Put Replace Old Value On New Value If The Map Previously Contained A Mapping For This Key")
@@ -195,6 +200,20 @@ class HashMapTest {
         assertEquals(2, hashMap.size());
         assertNull(hashMap.remove("keyNotExist"));
         assertEquals(2, hashMap.size());
+    }
+
+    @DisplayName("test Remove Removes By Null Key When Map Is Empty And Return Null And Size Should Be Equals To Zero")
+    @Test
+    public void testRemoveRemovesByNullKeyWhenMapIsEmptyAndReturnNullAndSizeShouldBeEqualsToZero() {
+        assertNull(hashMap.remove(null));
+        assertEquals(0, hashMap.size());
+    }
+
+    @DisplayName("test Remove Removes By Not Null Key When Map Is Empty And Return Null And Size Should Be Equals To Zero")
+    @Test
+    public void testRemoveRemovesByNotNullKeyWhenMapIsEmptyAndReturnNullAndSizeShouldBeEqualsToZero() {
+        assertNull(hashMap.remove("key"));
+        assertEquals(0, hashMap.size());
     }
 
     @DisplayName("test Contains Returns True If This Map Contains A Mapping For The Specified Key")

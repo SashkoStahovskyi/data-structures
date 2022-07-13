@@ -5,10 +5,11 @@ import java.util.*;
 public class HashMap<K, V> implements Map<K, V> {
 
     private static final int DEFAULT_INITIAL_CAPACITY = 10;
+    private static final double DEFAULT_LOAD_FACTOR = 0.65;
     private static final int DEFAULT_GROW_FACTOR = 2;
-    private static final double DEFAULT_LOAD_FACTOR = 0.75;
-    private int size;
     private List<Entry<K, V>>[] buckets;
+    private int size;
+
 
     @SuppressWarnings("unchecked")
     public HashMap() {
@@ -23,10 +24,11 @@ public class HashMap<K, V> implements Map<K, V> {
         growIfNeeded();
         Entry<K, V> entry = getEntry(key);
         if (entry != null) {
-            V returnValue = entry.getValue();
+            V oldValue = entry.getValue();
             entry.setValue(value);
-            return returnValue;
+            return oldValue;
         }
+
         List<Entry<K, V>> list = getBucket(key);
         list.add(new Entry<>(key, value));
         size++;
@@ -58,6 +60,7 @@ public class HashMap<K, V> implements Map<K, V> {
         Iterator<Entry<K, V>> iterator = bucket.iterator();
         while (iterator.hasNext()) {
             Entry<K, V> entry = iterator.next();
+
             if (Objects.equals(entry.getKey(), key)) {
                 V returnValue = entry.getValue();
                 iterator.remove();
@@ -83,32 +86,46 @@ public class HashMap<K, V> implements Map<K, V> {
     }
 
     private void growIfNeeded() {
-        if (buckets.length * DEFAULT_LOAD_FACTOR <= size) {
-            growCapacity();
+        if (buckets.length * DEFAULT_LOAD_FACTOR < size) {
+            List<Entry<K, V>>[] newBuckets = createNewBuckets();
+            innerPut(newBuckets);
+            buckets = newBuckets;
         }
     }
 
-    private void growCapacity() {
+    private void innerPut(List<Entry<K, V>>[] newBuckets) {
+        for (List<Entry<K, V>> list : buckets) {
+            for (Entry<K, V> entry : list) {
+                int index = getIndexForNewBuckets(entry, newBuckets);
+                newBuckets[index].add(entry);
+            }
+        }
+    }
+
+    private List<Entry<K, V>>[] createNewBuckets() {
         int newBucketCount = DEFAULT_INITIAL_CAPACITY * DEFAULT_GROW_FACTOR;
         @SuppressWarnings("unchecked")
         List<Entry<K, V>>[] newBuckets = new ArrayList[newBucketCount];
-        for (List<Entry<K, V>> list : buckets) {
-            if (list != null) {
-                for (Entry<K, V> entry : list) {
-                    if (newBuckets[getIndex(entry.getKey())] != null) {
-                        newBuckets[getIndex(entry.getKey())].add(entry);
-                    } else {
-                        List<Entry<K, V>> newBucket = new ArrayList<>(1);
-                        newBucket.add(entry);
-                        newBuckets[getIndex(entry.getKey())] = newBucket;
-                    }
-                }
-            }
+
+        for (int i = 0; i < newBuckets.length; i++) {
+            newBuckets[i] = new ArrayList<>(1);
         }
-        buckets = newBuckets;
+        return newBuckets;
     }
 
-    private int getIndex(K key) {
+    private int getIndexForNewBuckets(Entry<K, V> entry, List<Entry<K, V>>[] newBuckets) {
+        K key = entry.getKey();
+        if (key == null) {
+            return 0;
+        }
+        int hashCode = key.hashCode();
+        if (hashCode == Integer.MIN_VALUE) {
+            return 0;
+        }
+        return Math.abs(hashCode) % newBuckets.length;
+    }
+
+    private int getBucketsIndex(K key) {
         if (key == null) {
             return 0;
         }
@@ -142,7 +159,7 @@ public class HashMap<K, V> implements Map<K, V> {
     }
 
     private List<Entry<K, V>> getBucket(K key) {
-        int index = getIndex(key);
+        int index = getBucketsIndex(key);
         return buckets[index];
     }
 
